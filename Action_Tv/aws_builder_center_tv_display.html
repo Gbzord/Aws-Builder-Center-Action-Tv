@@ -1,0 +1,597 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('./Fonte/AmazonEmberDisplay_Rg.ttf');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000000;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'AmazonEmberDisplay_Rg', sans-serif;
+  }
+
+  /* Stage: author at 1280x720, but allow scaling to fit display */
+  .tv-wrapper {
+    width: 1280px;
+    height: 720px;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+    font-size: 16px; 
+  }
+
+  /* Animated background blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.7;
+  }
+  .blob-1 {
+    width: 45%;
+    height: 60%;
+    background: radial-gradient(circle, #a200ff 0%, #a200ff 60%, transparent 100%);
+    top: -15%;
+    left: -10%;
+    animation: blobMove1 8s ease-in-out infinite alternate;
+  }
+  .blob-2 {
+    width: 35%;
+    height: 50%;
+    background: radial-gradient(circle, #a200ff 0%, #a200ff 60%, transparent 100%);
+    bottom: -10%;
+    right: -5%;
+    animation: blobMove2 10s ease-in-out infinite alternate;
+  }
+  .blob-3 {
+    width: 20%;
+    height: 30%;
+    background: radial-gradient(circle, #a200ff 0%, #a200ff 60%, transparent 100%);
+    top: 30%;
+    right: 20%;
+    animation: blobMove3 7s ease-in-out infinite alternate;
+  }
+
+
+  /* Grid overlay */
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(17, 53, 197, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,26,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Layout */
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3% 4%; /* reduced safe-area for TVs */
+  }
+
+  /* Top bar */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  
+  
+
+  .live-badge {
+    background: #bd00f7;
+    color: #fff;
+    font-size: 1vw;
+    font-weight: 700;
+    padding: 0.4vw 1vw;
+    border-radius: 2px;
+    letter-spacing: 0.15em;
+    animation: none;
+  }
+
+
+  /* Main headline */
+  .headline-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2% 0;
+  }
+
+  .tagline {
+    font-size: 1.1vw;
+    color: #ffffff;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 1.5%;
+    animation: fadeSlideUp 0.8s ease forwards;
+  }
+
+  .main-title {
+    font-family: 'AmazonEmberDisplay_Rg', sans-serif;
+    font-size: 48px; /* fixed pixel size for predictable scaling */
+    line-height: 0.9;
+    color: #fff;
+    animation: fadeSlideUp 0.8s ease 0.2s forwards;
+    opacity: 0;
+  }
+
+  .main-title .accent {
+    color: #a200ff;
+    font-weight: bold;
+    display: block;
+  }
+  .main-title .accent2 {
+    color: #ffffff;
+    font-weight: bold;
+    display: block;
+  }
+
+  .subtitle {
+    font-size: 20px; /* fixed pixel size */
+    color: rgb(255, 255, 255);
+    margin-top: 1.5%;
+    font-weight: 400;
+    animation: fadeSlideUp 0.8s ease 0.4s forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Features strip */
+  .features-strip {
+    display: flex;
+    gap: 2%;
+    margin-top: 2%;
+    animation: fadeSlideUp 0.8s ease 0.6s forwards;
+    opacity: 0;
+  }
+
+  .feature-card {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 2% 2.5%;
+    display: flex;
+    align-items: flex-start;
+    gap: 4%;
+  }
+
+  .feature-icon {
+    width: 2.5vw;
+    height: 2.5vw;
+    background: rgba(255,107,26,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .feature-icon svg {
+    width: 1.4vw;
+    height: 1.4vw;
+    fill: #a200ff;
+  }
+
+  .feature-text {}
+  .feature-title {
+    font-size: 1vw;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .feature-desc {
+    font-size: 0.8vw;
+    color: rgba(255,255,255,0.55);
+    margin-top: 0.3vw;
+    line-height: 1.4;
+  }
+
+  /* Bottom bar */
+  .bottom-bar {
+    display: flex;
+    justify-content:flex-start;
+    gap: 4%;
+    align-items: center;
+    border-top: 1px solid rgba(221, 0, 255, 0.25);
+    padding-top: 2%;
+    animation: fadeSlideUp 0.8s ease 0.8s forwards;
+    opacity: 0;
+  }
+
+  .cta-text {
+    font-size: 2.5vw;
+    color: rgb(255, 255, 255);
+    font-weight: 400;
+  }
+
+  .cta-text strong {
+    color: #a200ff;
+    font-weight: 700;
+  }
+
+  .qr-placeholder {
+    width: clamp(84px, 9vw, 140px);
+    height: clamp(84px, 9vw, 140px);
+    background: #fff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  .qr-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .qr-cell {
+    background: #000000;
+    border-radius: 1px;
+  }
+
+  .qr-cell.white {
+    background: #fff;
+  }
+
+  .live-badge {
+    background: #bd00f7;
+    color: #fff;
+    font-size: 1vw;
+    font-weight: 700;
+    padding: 0.4vw 1vw;
+    border-radius: 2px;
+    letter-spacing: 0.15em;
+    transform: translateY(0);
+    opacity: 0;
+    animation: badgeEntrance 0.8s ease-out forwards, pulseBadge 2.5s 0.8s cubic-bezier(.4,0,.2,1) infinite;
+  }
+
+  @keyframes badgeEntrance {
+    from { opacity: 0; transform: translateY(-14px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes pulseBadge {
+    0%, 100% { opacity: 1; transform: translateY(0); box-shadow: 0 0 0 rgba(162,0,255,0); }
+    40% { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(162,0,255,0.12); }
+    60% { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(162,0,255,0.15); }
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Scrolling ticker */
+  .ticker-wrap {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #a200ff;
+    height: 36px; /* fixed px for consistent visibility on TVs */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    z-index: 1; /* keep ticker behind panel content */
+  }
+
+  .ticker-content {
+    white-space: nowrap;
+    animation: ticker 20s linear infinite;
+    font-size: 0.85vw;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 2%;
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100%); }
+  }
+
+  /* Sliding panel animation for different slides */
+  .slide-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5%;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  .slide-panel.active {
+    opacity: 1;
+  }
+
+  /* Second slide — Brazilian style */
+  .slide-2 {
+    background: linear-gradient(135deg, #0047AB 0%, #003080 100%);
+  }
+
+  .slide-2 .s2-label {
+    font-size: 1vw;
+    color: #FFD700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 3%;
+  }
+
+  .slide-2 .s2-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 7vw;
+    line-height: 0.9;
+    color: #fff;
+  }
+
+  .slide-2 .s2-title .green { color: #00A550; }
+  .slide-2 .s2-title .yellow { color: #FFD700; }
+
+  .slide-2 .s2-body {
+    font-size: 1.5vw;
+    color: rgba(255,255,255,0.85);
+    margin-top: 3%;
+    max-width: 65%;
+    line-height: 1.6;
+  }
+
+  .s2-chevrons {
+    position: absolute;
+    right: 5%;
+    bottom: 15%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+  }
+
+  .chevron-row {
+    display: flex;
+    gap: 0.5vw;
+  }
+
+  .chev {
+    width: 4vw;
+    height: 4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chev svg { width: 100%; height: 100%; }
+
+  /* Make any video inside a slide fill the slide area */
+  .slide-panel .video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    background: #000;
+  }
+
+  /* Keep the ticker behind content while still above the video */
+  .slide-panel .ticker-wrap {
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div class="tv-wrapper" id="tv">
+
+  <!-- SLIDE 1  -->
+  <div class="slide-panel active" id="slide1">
+    <div class="blob blob-1"></div>
+
+    <div class="blob blob-3"></div>
+    <div class="grid-overlay"></div>
+    <div class="content">
+      <div class="top-bar">
+        <div>
+
+          <img src="./image/logo.png" style="height:6.5vw;">
+          
+        </div>
+        <div class="live-badge">Inscrições Abertas</div>
+      </div>
+
+      <div class="headline-area">
+        
+        <div class="main-title">
+
+          <span class="accent2">AWS</span>
+          
+          <span class="accent">BUILDER CENTER</span>
+      
+        </div>
+        <div class="subtitle">Hub definitivo para quem quer dominar a nuvem de verdade.</div>
+
+        <div class="features-strip">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">+ 600 Cursos</div>
+              <div class="feature-desc">AWS Skill Builder, básico ao avançado.</div>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">Ecossistema Global</div>
+              <div class="feature-desc">Builders ativos de todo o mundo.</div>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">Influência Direta</div>
+              <div class="feature-desc">Opine nas decisões de engenharia da AWS.</div>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="feature-text">
+              <div class="feature-title">Free Tier</div>
+              <div class="feature-desc">Sem cartão de crédito. Sem surpresas.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="cta-text">
+          Cadastre-se agora <strong class="accent">gratuitamente</strong> &rarr;<br>
+        </div>
+        <div class="qr-placeholder" id="qr-placeholder">
+          <div id="qr-code" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ticker-wrap">
+      <div class="ticker-content">
+        ★ AWS BUILDER CENTER &nbsp;&nbsp;&nbsp; 
+        ★ +600 CURSOS &nbsp;&nbsp;&nbsp; 
+        ★ FREE TIER AWS - SEM CARTÃO &nbsp;&nbsp;&nbsp; 
+        ★ ECOSSISTEMA GLOBAL DE BUILDERS &nbsp;&nbsp;&nbsp; ★ WISHLIST: INFLUENCIE A AWS &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ★ AWS BUILDER CENTER &nbsp;&nbsp;&nbsp; 
+      </div>
+    </div>
+  </div>
+
+<!-- SLIDE 1  -->
+
+<!-- SLIDE 2 -->
+   
+  <div class="slide-panel slide-2" id="slide2">
+    <video class="video" playsinline preload="auto" autoplay muted loop>
+      <source src="./Video/Aws_Video.mp4" type="video/mp4">
+    </video>
+  </div>
+<!-- SLIDE 2 -->
+   
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide-panel');
+  let current = 0;
+  setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+}, 12000);
+</script>
+
+<script>
+  function fitStage() {
+    const stage = document.getElementById('tv');
+    if (!stage) return;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const scale = Math.min(vw / 1280, vh / 720);
+    const scaledW = 1280 * scale;
+    const scaledH = 720 * scale;
+    stage.style.position = 'fixed';
+    stage.style.left = `${Math.round((vw - scaledW) / 2)}px`;
+    stage.style.top = `${Math.round((vh - scaledH) / 2)}px`;
+    stage.style.transformOrigin = 'top left';
+    stage.style.transform = `scale(${scale})`;
+    // garanta que permaneça no topo
+    stage.style.zIndex = '1';
+    // Se houver uma função para renderizar o QR, chame-a após ajustar o layout
+    if (typeof window.renderGeneratedQR === 'function') window.renderGeneratedQR();
+  }
+
+  window.addEventListener('resize', fitStage);
+  window.addEventListener('load', fitStage);
+  window.addEventListener('DOMContentLoaded', fitStage);
+</script>
+
+<!-- QR code: prefer path image  and fallback to generator CDN -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('qr-code');
+    if (!container) return;
+
+    const localSrc = './image/Qr_Code_2.png';
+    const img = new Image();
+    img.src = localSrc;
+    img.alt = 'QR Code';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
+
+    img.onload = () => {
+      container.innerHTML = '';
+      container.appendChild(img);
+    };
+
+    img.onerror = () => {
+      // fallback: dynamically load qrcodejs from CDN and generate QR
+      const qrText = 'https://builder.aws.com/start?trk=e9f60726-8d6e-4a48-ab37-73f0f699312d&sc_channel=sm';
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.onload = () => {
+        container.innerHTML = '';
+        const rect = container.getBoundingClientRect();
+        const size = Math.max(64, Math.min(Math.floor(rect.width), Math.floor(rect.height)) || 128);
+        new QRCode(container, {
+          text: qrText,
+          width: size,
+          height: size,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      };
+      script.onerror = () => {
+        container.innerHTML = '<div style="color:#000; text-align:center; font-size:12px">QR indisponível</div>';
+      };
+      document.body.appendChild(script);
+    };
+
+    // start loading local image (triggers onload/onerror)
+  });
+</script>
+
+</body>
+
+</html>
